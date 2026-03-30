@@ -1,0 +1,68 @@
+# ----------------------------
+# OS / Editor
+# ----------------------------
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+*.code-workspace
+
+# ----------------------------
+# Bazel
+# ----------------------------
+/bazel-*
+/.bazelrc.user
+/.bazelproject
+/.bazelversion.local
+
+# Optional Bazel profile/log outputs
+*.profile.gz
+command.profile.gz
+
+# ----------------------------
+# CMake / native builds
+# ----------------------------
+/build/
+/cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+CTestTestfile.cmake
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# ----------------------------
+# C/C++ binaries & debug symbols
+# ----------------------------
+*.exe
+*.dll
+*.lib
+*.a
+*.so
+*.dylib
+*.obj
+*.o
+*.pdb
+*.ilk
+*.exp
+
+# ----------------------------
+# Temp / logs
+# ----------------------------
+*.log
+*.tmp
+*.temp
+
+# ----------------------------
+# Python cache (if tooling scripts exist)
+# ----------------------------
+__pycache__/
+*.pyc
+
+# ----------------------------
+# Keep third_party sources out of tracked files
+# ----------------------------
+/third_party/
+assets/fonts/
+rubbish/
