@@ -1,5 +1,8 @@
 # OminiDrive-UI
 
+![OminiDrive-UI 界面预览](.github/assets/images/ui_preview.png)
+*OminiDrive-UI 默认主题与停靠（Docking）功能演示*
+
 **项目定位**：一个轻量、高效、易于扩展的桌面应用框架
 - 💻 **编程语言**：C++
 - 🎨 **渲染架构**：Dear ImGui 即时模式 GUI 与 OpenGL 渲染
