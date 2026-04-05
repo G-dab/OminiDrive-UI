@@ -1,7 +1,7 @@
 # OminiDrive-UI
 
 <p align="center">
-  <img src=".github/assets/images/ui_preview.png" alt="OminiDrive Logo" width="500">
+  <img src=".github/assets/images/ui_preview.png" alt="OminiDrive Logo" width="800">
   <br>
   <b>OminiDrive-UI</b>
   <br>
