@@ -6,7 +6,7 @@ namespace {
 constexpr float kTopMenuHeight = 28.0f;
 constexpr float kActivityBarWidth = 56.0f;
 constexpr float kSideBarWidth = 300.0f;
-constexpr float kStatusBarHeight = 26.0f;
+constexpr float kStatusBarHeight = 26.0f;   // 状态栏高度
 const ImU32 kSeparatorColor = IM_COL32(70, 76, 84, 255);
 } // namespace
 
@@ -126,10 +126,19 @@ void PageManager::Render() {
 
     ImGui::SetNextWindowPos(ImVec2(vp_pos.x, content_top + content_height));
     ImGui::SetNextWindowSize(ImVec2(vp_size.x, kStatusBarHeight));
+    {
+        const ImGuiStyle& style = ImGui::GetStyle();
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
+                            ImVec2(style.WindowPadding.x, 0.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, 0.0f));
+    }
     ImGui::Begin("StatusBar", nullptr,
                  ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
     ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.478f, 0.800f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.478f, 0.800f, 1.0f));
+    float text_y_offset = (kStatusBarHeight - ImGui::GetTextLineHeight()) * 0.5f; // 居中字体
+    ImGui::SetCursorPosY(text_y_offset);
     ImGui::Text("Ready | Active: %s", pages_[selected_page_index_]->GetPageName());
     ImGui::SameLine();
     ImGui::TextUnformatted("|");
@@ -147,6 +156,7 @@ void PageManager::Render() {
     ImGui::Text("Time: %s", time_buf);
     ImGui::PopStyleColor(2);
     ImGui::End();
+    ImGui::PopStyleVar(3);
 
     ImDrawList* fg = ImGui::GetForegroundDrawList(viewport);
     const float x1 = vp_pos.x + kActivityBarWidth;

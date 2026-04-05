@@ -1,6 +1,7 @@
 # YuanDE（ImGui + GLFW + OpenGL3）
 
 **项目定位**：一个轻量、高效、易于扩展的桌面应用框架
+- 编程语言：C++
 - 渲染架构：Dear ImGui 即时模式 GUI 与 OpenGL 渲染
 - 构建工具：Bazel，支持一键编译到Windows、Linux、MacOS下的桌面应用程序
 - 易于扩展：模块化页面（IPage）机制，易于添加各类工具页面
@@ -48,6 +49,12 @@ bazel build //:app
 ```powershell
 bazel run //:app
 ```
+
+## 2. 使用指南
+
+### 2.1 拉取已创建页面
+
+### 2.2 创建自己的页面
 
 ## 仓库结构
 

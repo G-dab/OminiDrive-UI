@@ -1,50 +1,64 @@
-// main.cpp
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include <GLFW/glfw3.h>
+
 #include <filesystem>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
+#include <GLFW/glfw3.h>
+#include "tools/cpp/runfiles/runfiles.h"
+using bazel::tools::cpp::runfiles::Runfiles;
 
 #include "src/base/include/PageManager.h"
+#include "src/ui/include/SerialAssistantPage.h"
 
-static void glfw_error_callback(int error, const char* description) {
-    std::cerr << "GLFW Error " << error << ": " << description << std::endl;
+static std::string ResolveRunfilePath(const bazel::tools::cpp::runfiles::Runfiles* runfiles, const std::string& runfile_path)
+{
+    if (runfiles == nullptr) {
+        return runfile_path;
+    }
+    const std::string resolved = runfiles->Rlocation(runfile_path);
+    return resolved.empty() ? runfile_path : resolved;
 }
 
-static void ConfigureUIFont(ImGuiIO& io) {
-    // Font customization entry:
-    // 1) Put real font files under assets/fonts/
-    // 2) Replace placeholder file names below
-    // 3) Adjust kUiFontSize for global text size
+static void ConfigureUIFont(ImGuiIO& io, const bazel::tools::cpp::runfiles::Runfiles* runfiles) {
+    // 总字号
     constexpr float kUiFontSize = 18.0f;
-    constexpr const char* kEnglishFontPath = "assets/fonts/ConsolaMono-Book.ttf";
-    constexpr const char* kChineseFontPath = "assets/fonts/NotoSansCJK-Regular.ttf";
+    // 英文字体
+    const std::string english_font_path = ResolveRunfilePath(
+        runfiles,
+        "gui/assets/fonts/consola_mono/ConsolaMono-Bold.ttf"
+    );
+    // 中文字体
+    const std::string chinese_font_path = ResolveRunfilePath(
+        runfiles,
+        "gui/assets/fonts/Sarasa-TTC-1.0.36/Sarasa-Bold.ttc"
+    );
 
+    // 英文字体配置
     ImFont* english_font = nullptr;
-    if (std::filesystem::exists(kEnglishFontPath)) {
+    if (std::filesystem::exists(english_font_path)) {
         ImFontConfig en_cfg;
         en_cfg.OversampleH = 2;
         en_cfg.OversampleV = 2;
         en_cfg.PixelSnapH = false;
         english_font = io.Fonts->AddFontFromFileTTF(
-            kEnglishFontPath,
+            english_font_path.c_str(),
             kUiFontSize,
             &en_cfg,
             io.Fonts->GetGlyphRangesDefault()
         );
         if (english_font) {
             io.FontDefault = english_font;
-            std::cerr << "[Font] Loaded English font: " << kEnglishFontPath << std::endl;
+            std::cerr << "[Font] Loaded English font: " << english_font_path << std::endl;
         } else {
-            std::cerr << "[Font][WARN] English font exists but failed to load: " << kEnglishFontPath << std::endl;
+            std::cerr << "[Font][WARN] English font exists but failed to load: " << english_font_path << std::endl;
         }
     } else {
-        std::cerr << "[Font][WARN] English font file not found: " << kEnglishFontPath << std::endl;
+        std::cerr << "[Font][WARN] English font file not found: " << english_font_path << std::endl;
     }
 
     if (english_font == nullptr) {
@@ -55,25 +69,26 @@ static void ConfigureUIFont(ImGuiIO& io) {
         std::cerr << "[Font] Fallback to default font for Latin glyphs.\n";
     }
 
-    if (std::filesystem::exists(kChineseFontPath)) {
+    // 中文字体配置
+    if (std::filesystem::exists(chinese_font_path)) {
         ImFontConfig zh_cfg;
         zh_cfg.MergeMode = true;
         zh_cfg.OversampleH = 2;
         zh_cfg.OversampleV = 2;
         zh_cfg.PixelSnapH = false;
         ImFont* merged = io.Fonts->AddFontFromFileTTF(
-            kChineseFontPath,
+            chinese_font_path.c_str(),
             kUiFontSize,
             &zh_cfg,
             io.Fonts->GetGlyphRangesChineseSimplifiedCommon()
         );
         if (merged) {
-            std::cerr << "[Font] Merged Chinese font: " << kChineseFontPath << std::endl;
+            std::cerr << "[Font] Merged Chinese font: " << chinese_font_path << std::endl;
         } else {
-            std::cerr << "[Font][WARN] Chinese font exists but merge failed: " << kChineseFontPath << std::endl;
+            std::cerr << "[Font][WARN] Chinese font exists but merge failed: " << chinese_font_path << std::endl;
         }
     } else {
-        std::cerr << "[Font][WARN] Chinese font file not found, Chinese glyphs may fallback/miss: " << kChineseFontPath << std::endl;
+        std::cerr << "[Font][WARN] Chinese font file not found, Chinese glyphs may fallback/miss: " << chinese_font_path << std::endl;
     }
 }
 
@@ -87,9 +102,8 @@ public:
     void RenderMainWorkspace() override {}
 };
 
-int main(int, char**) {
-    // 1. 设置错误回调并初始化 GLFW
-    glfwSetErrorCallback(glfw_error_callback);
+int main(int, char** argv) {
+    // 1. 初始化 GLFW
     if (!glfwInit())
         return 1;
 
@@ -110,13 +124,21 @@ int main(int, char**) {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // 允许键盘控制
-    ConfigureUIFont(io);
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // 允许停靠
+
+    std::string runfiles_error;
+    std::unique_ptr<Runfiles> runfiles(Runfiles::Create(argv[0], &runfiles_error));
+    if (!runfiles) {
+        std::cerr << "[Font][WARN] Failed to initialize Bazel runfiles: " << runfiles_error
+                  << ". Falling back to plain relative paths.\n";
+    }
+    ConfigureUIFont(io, runfiles.get());
 
     PageManager page_manager;
-    page_manager.RegisterPage(std::make_shared<DummyPage>());
+    // page_manager.RegisterPage(std::make_shared<DummyPage>());
+    page_manager.RegisterPage(std::make_shared<SerialAssistantPage>());
     page_manager.ApplyVSCodeLikeTheme();
 
-    // 初始化后端
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
