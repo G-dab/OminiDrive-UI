@@ -1,6 +1,13 @@
 # OminiDrive-UI
 
-**项目定位**：一个轻量、高效、易于扩展的桌面应用框架
+<p align="center">
+  <img src=".github/assets/images/ui_preview.png" alt="OminiDrive Logo" width="500">
+  <br>
+  <b>OminiDrive-UI</b>
+  <br>
+  <i>一个轻量、高效、易于扩展的桌面应用框架</i>
+</p>
+
 - 💻 **编程语言**：C++
 - 🎨 **渲染架构**：Dear ImGui 即时模式 GUI 与 OpenGL 渲染
 - ⚡ **构建工具**：Bazel，支持一键编译到 Windows、Linux、MacOS 下的桌面应用程序
